@@ -148,6 +148,8 @@ tr:hover td{background:rgba(0,212,255,.02)}
 .auth-ov{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
 .auth-box{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:30px;width:100%;max-width:360px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -315,10 +317,51 @@ const DAY_AR=['الأحد','الاثنين','الثلاثاء','الأربعاء
 const SUB=700;
 let curPage='dashboard',editId=null,photo=null,sess=null,payId=null,finMo=null,editGrpId=null;
 
-const db={
-  g:(k,d=[])=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
-  s:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+// FIREBASE INIT
+const firebaseConfig = {
+  apiKey: "AIzaSyAC9FMAQT-DLefX91Szff1qZxePcb82gnk",
+  authDomain: "startacademy-4d585.firebaseapp.com",
+  databaseURL: "https://startacademy-4d585-default-rtdb.firebaseio.com",
+  projectId: "startacademy-4d585",
+  storageBucket: "startacademy-4d585.firebasestorage.app",
+  messagingSenderId: "1027206926684",
+  appId: "1:1027206926684:web:0572e21ac477c56d7b7199"
 };
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+const db={
+  g:(k,d=[])=>{try{const val=JSON.parse(localStorage.getItem(k));return val===null?d:val;}catch{return d}},
+  s:(k,v)=>{
+    localStorage.setItem(k,JSON.stringify(v));
+    if(window.database) database.ref(k).set(v);
+  }
+};
+
+const F_KEYS = ['ac_pl', 'ac_at', 'ac_pay', 'ac_grp', 'ac_auth'];
+let isInitialSyncDone = false;
+database.ref('/').once('value').then(snap => {
+  const data = snap.val();
+  if (!data) {
+    F_KEYS.forEach(k => {
+      const local = localStorage.getItem(k);
+      if (local) database.ref(k).set(JSON.parse(local));
+    });
+  }
+  F_KEYS.forEach(k => {
+    database.ref(k).on('value', s => {
+      const v = s.val();
+      if (v) localStorage.setItem(k, JSON.stringify(v));
+      else localStorage.removeItem(k);
+      
+      if(k==='ac_auth') initAuth();
+      if(isInitialSyncDone) render();
+    });
+  });
+  isInitialSyncDone = true;
+  render();
+});
+
 const PL={all:()=>db.g('ac_pl'),save:v=>db.s('ac_pl',v)};
 const AT={all:()=>db.g('ac_at'),save:v=>db.s('ac_at',v)};
 const PAY={all:()=>db.g('ac_pay'),save:v=>db.s('ac_pay',v)};
@@ -792,6 +835,9 @@ function initAuth(){
   if(!auth){
     document.getElementById('authTitle').textContent='إعداد كلمة المرور';
     document.getElementById('authSub').textContent='لأول مرة، قم بإنشاء كلمة مرور لحماية بياناتك';
+  } else {
+    document.getElementById('authTitle').textContent='تسجيل الدخول';
+    document.getElementById('authSub').textContent='أدخل كلمة المرور للدخول للأكاديمية';
   }
 }
 function checkAuth(){
