@@ -327,14 +327,24 @@ const firebaseConfig = {
   messagingSenderId: "1027206926684",
   appId: "1:1027206926684:web:0572e21ac477c56d7b7199"
 };
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+
+let isFirebaseReady = false;
+let database = null;
+try {
+  if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    isFirebaseReady = true;
+  }
+} catch (err) {
+  console.error("Firebase init failed:", err);
+}
 
 const db={
   g:(k,d=[])=>{try{const val=JSON.parse(localStorage.getItem(k));return val===null?d:val;}catch{return d}},
   s:(k,v)=>{
     localStorage.setItem(k,JSON.stringify(v));
-    if(window.database) database.ref(k).set(v);
+    if(isFirebaseReady && database) database.ref(k).set(v);
   }
 };
 
@@ -344,30 +354,31 @@ let isInitialSyncDone = false;
 // Initial render from local storage (Offline First)
 render();
 
-database.ref('/').once('value').then(snap => {
-  const data = snap.val();
-  if (!data) {
+if (isFirebaseReady && database) {
+  database.ref('/').once('value').then(snap => {
+    const data = snap.val();
+    if (!data) {
+      F_KEYS.forEach(k => {
+        const local = localStorage.getItem(k);
+        if (local) database.ref(k).set(JSON.parse(local));
+      });
+    }
     F_KEYS.forEach(k => {
-      const local = localStorage.getItem(k);
-      if (local) database.ref(k).set(JSON.parse(local));
+      database.ref(k).on('value', s => {
+        const v = s.val();
+        if (v) localStorage.setItem(k, JSON.stringify(v));
+        else localStorage.removeItem(k);
+        
+        if(k==='ac_auth') initAuth();
+        if(isInitialSyncDone) render();
+      });
     });
-  }
-  F_KEYS.forEach(k => {
-    database.ref(k).on('value', s => {
-      const v = s.val();
-      if (v) localStorage.setItem(k, JSON.stringify(v));
-      else localStorage.removeItem(k);
-      
-      if(k==='ac_auth') initAuth();
-      if(isInitialSyncDone) render();
-    });
+    isInitialSyncDone = true;
+    render();
+  }).catch(err => {
+    console.error("Firebase Sync Error:", err);
   });
-  isInitialSyncDone = true;
-  render();
-}).catch(err => {
-  console.error("Firebase Sync Error:", err);
-  toast('تعذر الاتصال بقاعدة البيانات، تعمل الآن في وضع الأوفلاين','err');
-});
+}
 
 const PL={all:()=>db.g('ac_pl'),save:v=>db.s('ac_pl',v)};
 const AT={all:()=>db.g('ac_at'),save:v=>db.s('ac_at',v)};
