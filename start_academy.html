@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Start Academy — مصطفى محمد</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --p:#00d4ff;--p2:#1a6fff;
+  --bg:#080d1a;--surf:#0d1424;
+  --card:rgba(255,255,255,0.04);--border:rgba(0,212,255,0.18);--borderS:rgba(255,255,255,0.08);
+  --txt:#e2eeff;--muted:#7a90b0;
+  --ok:#00e68a;--err:#ff4466;--warn:#ffc044;--info:#6699ff;
+  --sw:260px;--r:14px;--rs:10px;--tr:0.25s cubic-bezier(.4,0,.2,1)
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:-1;background:
+  radial-gradient(ellipse 800px 600px at 15% 10%,rgba(0,212,255,.06) 0%,transparent 60%),
+  radial-gradient(ellipse 600px 500px at 85% 85%,rgba(26,111,255,.07) 0%,transparent 60%)}
+.sidebar{position:fixed;inset-block:0;inset-inline-end:0;width:var(--sw);background:rgba(8,13,26,.96);backdrop-filter:blur(24px);border-inline-start:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.slogo{padding:20px;text-align:center;border-bottom:1px solid var(--border)}
+.slogo span{font-size:2rem;display:block;margin-bottom:4px;filter:drop-shadow(0 0 10px rgba(0,212,255,.5))}
+.slogo h1{font-size:1.15rem;font-weight:900;background:linear-gradient(135deg,#00d4ff,#6699ff,#00e68a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.slogo p{font-size:.72rem;color:var(--muted);margin-top:3px}
+.navlinks{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:3px}
+.ni{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:var(--rs);cursor:pointer;transition:all var(--tr);color:var(--muted)}
+.ni:hover{background:rgba(0,212,255,.08);color:var(--txt)}
+.ni.active{background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(26,111,255,.15));color:var(--p);font-weight:700}
+.ni .ico{font-size:1.15rem;width:24px;text-align:center}
+.ni .lbl{font-size:.88rem}
+.sfoot{padding:13px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.cav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#1a6fff);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#fff;flex-shrink:0}
+.main{margin-inline-end:var(--sw);padding:24px 20px;min-height:100vh}
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(8,13,26,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);z-index:100;padding:4px 0 calc(4px + env(safe-area-inset-bottom))}
+.binner{display:flex;justify-content:space-around}
+.bi{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;cursor:pointer;transition:all var(--tr);color:var(--muted)}
+.bi.active{color:var(--p)}
+.bi .bico{font-size:1.25rem}
+.bi .blbl{font-size:.6rem;font-weight:600}
+@media(max-width:768px){
+  .sidebar{display:none}.main{margin-inline-end:0;padding:13px 12px;padding-bottom:84px}
+  .bnav{display:block}.sg{grid-template-columns:1fr 1fr!important}
+  .fgrid{grid-template-columns:1fr!important}.fg3{grid-template-columns:1fr 1fr!important}
+}
+.card{background:var(--card);backdrop-filter:blur(12px);border:1px solid var(--borderS);border-radius:var(--r);padding:17px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:9px}
+.pt{font-size:1.45rem;font-weight:900}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.sc{background:var(--card);border:1px solid var(--borderS);border-radius:var(--r);padding:15px;transition:transform var(--tr)}
+.sc:hover{transform:translateY(-2px)}
+.sico{font-size:1.4rem;margin-bottom:7px;display:block}
+.sv{font-size:1.6rem;font-weight:900;line-height:1}
+.sl{font-size:.74rem;color:var(--muted);margin-top:4px}
+.fc{border-radius:var(--r);padding:18px;text-align:center}
+.fc.tot{background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(26,111,255,.08));border:1px solid rgba(0,212,255,.25)}
+.fc.club{background:linear-gradient(135deg,rgba(255,192,68,.12),rgba(255,120,0,.08));border:1px solid rgba(255,192,68,.25)}
+.fc.coa{background:linear-gradient(135deg,rgba(0,230,138,.12),rgba(0,180,100,.08));border:1px solid rgba(0,230,138,.25)}
+.fci{font-size:1.6rem;margin-bottom:5px}
+.fcl{font-size:.76rem;color:var(--muted);font-weight:600}
+.fca{font-size:1.7rem;font-weight:900;margin:5px 0 3px}
+.fcs{font-size:.7rem;color:var(--muted)}
+.pb{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-top:7px}
+.pf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--p),var(--p2));transition:width .6s ease}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.74rem;font-weight:700;white-space:nowrap}
+.bs{background:rgba(0,230,138,.15);color:var(--ok);border:1px solid rgba(0,230,138,.25)}
+.be{background:rgba(255,68,102,.15);color:var(--err);border:1px solid rgba(255,68,102,.25)}
+.bw{background:rgba(255,192,68,.15);color:var(--warn);border:1px solid rgba(255,192,68,.25)}
+.bi2{background:rgba(102,153,255,.15);color:var(--info);border:1px solid rgba(102,153,255,.25)}
+.bp{background:rgba(0,212,255,.15);color:var(--p);border:1px solid rgba(0,212,255,.25)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 16px;border-radius:var(--rs);border:none;cursor:pointer;font-family:'Cairo',sans-serif;font-size:.86rem;font-weight:700;transition:all var(--tr);white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-p{background:linear-gradient(135deg,#00d4ff,#1a6fff);color:#fff;box-shadow:0 4px 15px rgba(0,212,255,.25)}
+.btn-p:hover{box-shadow:0 6px 20px rgba(0,212,255,.4);transform:translateY(-2px)}
+.btn-s{background:rgba(0,230,138,.15);color:var(--ok);border:1px solid rgba(0,230,138,.3)}
+.btn-s:hover{background:rgba(0,230,138,.25)}
+.btn-d{background:rgba(255,68,102,.15);color:var(--err);border:1px solid rgba(255,68,102,.3)}
+.btn-d:hover{background:rgba(255,68,102,.25)}
+.btn-g{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--borderS)}
+.btn-g:hover{background:rgba(255,255,255,.1);color:var(--txt)}
+.btn-sm{padding:5px 11px;font-size:.76rem}
+.btn-w{background:rgba(255,192,68,.15);color:var(--warn);border:1px solid rgba(255,192,68,.3)}
+.fg{margin-bottom:13px}
+.fl{display:block;margin-bottom:5px;font-size:.8rem;font-weight:600;color:var(--muted)}
+.fi{width:100%;padding:10px 13px;background:rgba(255,255,255,.05);border:1px solid var(--borderS);border-radius:var(--rs);color:var(--txt);font-family:'Cairo',sans-serif;font-size:.88rem;transition:all var(--tr);appearance:none}
+.fi:focus{outline:none;border-color:var(--p);background:rgba(0,212,255,.05);box-shadow:0 0 0 3px rgba(0,212,255,.08)}
+.fi::placeholder{color:var(--muted)}
+select.fi option{background:var(--surf);color:var(--txt)}
+input[type=date].fi::-webkit-calendar-picker-indicator,
+input[type=month].fi::-webkit-calendar-picker-indicator,
+input[type=time].fi::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.5}
+.pi{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--card);border:1px solid var(--borderS);border-radius:var(--r);margin-bottom:8px;transition:all var(--tr);cursor:pointer}
+.pi:hover{border-color:var(--p);background:rgba(0,212,255,.04);transform:translateX(-3px)}
+.gc{background:var(--card);border:1px solid var(--borderS);border-radius:var(--r);padding:16px;margin-bottom:12px;transition:all var(--tr)}
+.gc:hover{border-color:var(--border)}
+.fmini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:rgba(255,255,255,.03);border-radius:var(--rs);padding:10px}
+.fmi{text-align:center}
+.fmil{font-size:.68rem;color:var(--muted);font-weight:600;margin-bottom:2px}
+.fmiv{font-size:.92rem;font-weight:800}
+.ab{width:38px;height:38px;border-radius:50%;border:2px solid;cursor:pointer;font-size:.9rem;transition:all var(--tr);display:flex;align-items:center;justify-content:center;font-weight:700;background:transparent;font-family:'Cairo',sans-serif}
+.ab.pb{border-color:rgba(0,230,138,.3);color:rgba(0,230,138,.3)}
+.ab.pb.on,.ab.pb:hover{background:rgba(0,230,138,.15);border-color:var(--ok);color:var(--ok)}
+.ab.xb{border-color:rgba(255,68,102,.3);color:rgba(255,68,102,.3)}
+.ab.xb.on,.ab.xb:hover{background:rgba(255,68,102,.15);border-color:var(--err);color:var(--err)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:13px}
+.ov.open{display:flex}
+.mbox{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:460px;max-height:92vh;overflow-y:auto;animation:mIn .3s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mt{font-size:1.15rem;font-weight:800;margin-bottom:18px}
+.puc{width:86px;height:86px;border-radius:50%;border:2px dashed var(--p);display:flex;align-items:center;justify-content:center;cursor:pointer;margin:0 auto 18px;overflow:hidden;transition:all var(--tr);background:rgba(0,212,255,.04)}
+.puc:hover{border-color:#fff;background:rgba(0,212,255,.1)}
+.puc img{width:100%;height:100%;object-fit:cover}
+table{width:100%;border-collapse:collapse}
+th{padding:8px 11px;text-align:right;font-size:.76rem;color:var(--muted);font-weight:700;border-bottom:1px solid var(--borderS)}
+td{padding:10px 11px;font-size:.83rem;border-bottom:1px solid rgba(255,255,255,.04)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(0,212,255,.02)}
+.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%) translateY(20px);padding:10px 20px;border-radius:26px;font-size:.86rem;font-weight:700;z-index:999;opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
+.toast.tok{background:linear-gradient(135deg,rgba(0,230,138,.95),rgba(0,180,100,.95));color:#fff}
+.toast.terr{background:linear-gradient(135deg,rgba(255,68,102,.95),rgba(200,30,60,.95));color:#fff}
+.toast.vis{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,.25);border-radius:2px}
+@keyframes pin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.page{animation:pin .3s ease}
+.dvd{height:1px;background:var(--borderS);margin:11px 0}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.eico{font-size:2.6rem;margin-bottom:9px;display:block}
+.etit{font-size:.95rem;font-weight:700;margin-bottom:6px}
+.esub{font-size:.8rem;margin-bottom:16px}
+.swrap{position:relative;margin-bottom:14px}
+.swrap .fi{padding-inline-start:38px}
+.swrap .sico{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;color:var(--muted)}
+.slbl{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.npill{display:inline-block;font-size:.74rem;padding:2px 8px;border-radius:20px;margin:2px}
+.npill.p{background:rgba(0,230,138,.12);color:var(--ok)}
+.npill.a{background:rgba(255,68,102,.12);color:var(--err)}
+.dstat{background:rgba(255,255,255,.04);border:1px solid var(--borderS);border-radius:var(--rs);padding:12px;text-align:center}
+.dstv{font-size:1.6rem;font-weight:900}
+.dstl{font-size:.72rem;color:var(--muted);margin-top:3px}
+/* Day checkbox pills */
+.day-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.day-pill{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;border:1px solid var(--borderS);cursor:pointer;font-size:.8rem;transition:all var(--tr);background:rgba(255,255,255,.03)}
+.day-pill input{display:none}
+.day-pill.checked{background:rgba(0,212,255,.15);border-color:var(--p);color:var(--p);font-weight:700}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="slogo">
+    <span>🏊</span><h1>START ACADEMY</h1><p>مصطفى محمد — المدرب</p>
+  </div>
+  <div class="navlinks">
+    <div class="ni active" id="nav-dashboard" onclick="goto('dashboard')"><span class="ico">🏠</span><span class="lbl">الرئيسية</span></div>
+    <div class="ni" id="nav-players" onclick="goto('players')"><span class="ico">👥</span><span class="lbl">اللاعبون</span></div>
+    <div class="ni" id="nav-groups" onclick="goto('groups')"><span class="ico">🏊</span><span class="lbl">المجموعات</span></div>
+    <div class="ni" id="nav-attendance" onclick="goto('attendance')"><span class="ico">✅</span><span class="lbl">الحضور</span></div>
+    <div class="ni" id="nav-finance" onclick="goto('finance')"><span class="ico">💰</span><span class="lbl">المالية</span></div>
+  </div>
+  <div class="sfoot"><div class="cav">م</div><div><div style="font-size:.85rem;font-weight:700;">مصطفى محمد</div><div style="font-size:.7rem;color:var(--muted);">المدرب</div></div></div>
+</nav>
+
+<nav class="bnav">
+  <div class="binner">
+    <div class="bi active" id="bnav-dashboard" onclick="goto('dashboard')"><span class="bico">🏠</span><span class="blbl">الرئيسية</span></div>
+    <div class="bi" id="bnav-players" onclick="goto('players')"><span class="bico">👥</span><span class="blbl">اللاعبون</span></div>
+    <div class="bi" id="bnav-groups" onclick="goto('groups')"><span class="bico">🏊</span><span class="blbl">المجموعات</span></div>
+    <div class="bi" id="bnav-attendance" onclick="goto('attendance')"><span class="bico">✅</span><span class="blbl">الحضور</span></div>
+    <div class="bi" id="bnav-finance" onclick="goto('finance')"><span class="bico">💰</span><span class="blbl">المالية</span></div>
+  </div>
+</nav>
+
+<main class="main" id="app"></main>
+
+<!-- Modal: Player -->
+<div class="ov" id="modPlayer">
+  <div class="mbox">
+    <h2 class="mt" id="modPT">إضافة لاعب</h2>
+    <div class="puc" id="puc" onclick="document.getElementById('fPhoto').click()"><span style="font-size:1.9rem;color:var(--muted)">📷</span></div>
+    <input type="file" id="fPhoto" accept="image/*" style="display:none" onchange="onPhoto(event)">
+    <div class="fg"><label class="fl">الاسم الكامل *</label><input class="fi" id="fName" type="text" placeholder="اسم اللاعب"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg"><label class="fl">السن *</label><input class="fi" id="fAge" type="number" min="3" max="60" placeholder="العمر"></div>
+      <div class="fg"><label class="fl">التليفون *</label><input class="fi" id="fPhone" type="tel" placeholder="01XXXXXXXXX"></div>
+    </div>
+    <div class="fg"><label class="fl">تاريخ الانضمام *</label><input class="fi" id="fJoin" type="date"></div>
+    <div class="fg"><label class="fl">المجموعة *</label><select class="fi" id="fGroup"></select></div>
+    <div class="fg"><label class="fl">قيمة الاشتراك الشهري (جنيه) *</label><input class="fi" id="fSub" type="number" value="700" placeholder="مثال: 700 أو 400"></div>
+    <div style="display:flex;gap:8px;margin-top:18px">
+      <button class="btn btn-p" style="flex:1" onclick="savePlayer()">💾 حفظ</button>
+      <button class="btn btn-g" onclick="closeM('modPlayer')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Group -->
+<div class="ov" id="modGroup">
+  <div class="mbox">
+    <h2 class="mt" id="modGT">إضافة مجموعة</h2>
+    <div class="fg"><label class="fl">اسم المجموعة *</label><input class="fi" id="gName" type="text" placeholder="مثال: مجموعة 6 مساءً"></div>
+    <div class="fg">
+      <label class="fl">أيام التمرين *</label>
+      <div class="day-pills" id="dayPills">
+        <label class="day-pill" onclick="toggleDay(this)"><input type="checkbox" value="0">الأحد</label>
+        <label class="day-pill" onclick="toggleDay(this)"><input type="checkbox" value="1">الاثنين</label>
+        <label class="day-pill" onclick="toggleDay(this)"><input type="checkbox" value="2">الثلاثاء</label>
+        <label class="day-pill" onclick="toggleDay(this)"><input type="checkbox" value="3">الأربعاء</label>
+        <label class="day-pill" onclick="toggleDay(this)"><input type="checkbox" value="4">الخميس</label>
+        <label class="day-pill" onclick="toggleDay(this)"><input type="checkbox" value="5">الجمعة</label>
+        <label class="day-pill" onclick="toggleDay(this)"><input type="checkbox" value="6">السبت</label>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">وقت التمرين *</label><input class="fi" id="gTime" type="time" value="18:00"></div>
+    <div style="display:flex;gap:8px;margin-top:18px">
+      <button class="btn btn-p" style="flex:1" onclick="saveGroup()">💾 حفظ المجموعة</button>
+      <button class="btn btn-g" onclick="closeM('modGroup')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Attendance Setup -->
+<div class="ov" id="modAtt">
+  <div class="mbox">
+    <h2 class="mt">📋 تسجيل الحضور</h2>
+    <div class="fg"><label class="fl">التاريخ *</label><input class="fi" id="attDate" type="date"></div>
+    <div class="fg"><label class="fl">المجموعة *</label><select class="fi" id="attGroup"></select></div>
+    <div style="display:flex;gap:8px;margin-top:18px">
+      <button class="btn btn-p" style="flex:1" onclick="beginAtt()">▶ بدء التسجيل</button>
+      <button class="btn btn-g" onclick="closeM('modAtt')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Payment -->
+<div class="ov" id="modPay">
+  <div class="mbox">
+    <h2 class="mt">💳 تسجيل دفعة</h2>
+    <div id="payInfo" style="background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:var(--rs);padding:11px;margin-bottom:14px"></div>
+    <div class="fg"><label class="fl">الشهر *</label><input class="fi" id="payMonth" type="month"></div>
+    <div class="fg"><label class="fl">تاريخ الدفع *</label><input class="fi" id="payDate" type="date"></div>
+    <div class="fg"><label class="fl">المبلغ</label><input class="fi" id="payAmt" type="number" value="700" readonly style="opacity:.65"></div>
+    <div style="display:flex;gap:8px;margin-top:18px">
+      <button class="btn btn-p" style="flex:1" onclick="confirmPay()">✓ تأكيد الدفع</button>
+      <button class="btn btn-g" onclick="closeM('modPay')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Player Detail -->
+<div class="ov" id="modDetail">
+  <div class="mbox" style="max-width:500px"><div id="detBody"></div>
+    <button class="btn btn-g" style="width:100%;margin-top:13px" onclick="closeM('modDetail')">إغلاق</button>
+  </div>
+</div>
+
+<!-- Modal: Confirm -->
+<div class="ov" id="modConfirm">
+  <div class="mbox" style="max-width:350px;text-align:center">
+    <div style="font-size:2.6rem;margin-bottom:11px">⚠️</div>
+    <h2 style="font-size:1.05rem;margin-bottom:7px">تأكيد الحذف</h2>
+    <p style="color:var(--muted);font-size:.86rem;margin-bottom:18px" id="confMsg"></p>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-d" style="flex:1" id="confOk">تأكيد</button>
+      <button class="btn btn-g" style="flex:1" onclick="closeM('modConfirm')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const DAY_AR=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const SUB=700;
+let curPage='dashboard',editId=null,photo=null,sess=null,payId=null,finMo=null,editGrpId=null;
+
+const db={
+  g:(k,d=[])=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+  s:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+};
+const PL={all:()=>db.g('ac_pl'),save:v=>db.s('ac_pl',v)};
+const AT={all:()=>db.g('ac_at'),save:v=>db.s('ac_at',v)};
+const PAY={all:()=>db.g('ac_pay'),save:v=>db.s('ac_pay',v)};
+const GRP={all:()=>db.g('ac_grp'),save:v=>db.s('ac_grp',v)};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const fmM=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+const tod=()=>new Date().toISOString().split('T')[0];
+const fmTime=t=>{if(!t)return'';const[h,m]=t.split(':');const hr=+h;return`${hr>12?hr-12:hr||12}:${m} ${hr>=12?'م':'ص'}`;}
+
+function clubOb(n){
+  if(n===0)return 0;
+  if(n<=4)return n*400;
+  if(n<=6)return 2200;
+  return(275+50*(n-6))*8;
+}
+function gFin(gid,mo){
+  const all=PL.all(),gp=all.filter(p=>p.groupId===gid);
+  const paid=PAY.all().filter(x=>{const p=all.find(pl=>pl.id===x.playerId);return p&&p.groupId===gid&&x.month===mo});
+  const col=paid.reduce((sum,x)=>sum+(x.amount||SUB),0);
+  const cl=clubOb(gp.length);
+  return{pc:gp.length,paid:paid.length,col,cl,coach:col-cl};
+}
+function mFin(mo){
+  let col=0,cl=0;
+  const det=GRP.all().map(g=>{const f=gFin(g.id,mo);col+=f.col;cl+=f.cl;return{...g,...f}});
+  return{col,cl,coach:col-cl,det};
+}
+
+// NAV
+function goto(p){
+  curPage=p;
+  document.querySelectorAll('.ni').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.bi').forEach(e=>e.classList.remove('active'));
+  const n=document.getElementById('nav-'+p),b=document.getElementById('bnav-'+p);
+  if(n)n.classList.add('active');if(b)b.classList.add('active');
+  render();
+}
+function render(){
+  const app=document.getElementById('app');
+  if(curPage==='dashboard')app.innerHTML=pgDash();
+  else if(curPage==='players')app.innerHTML=pgPlayers();
+  else if(curPage==='groups')app.innerHTML=pgGroups();
+  else if(curPage==='attendance')app.innerHTML=pgAtt();
+  else if(curPage==='finance')app.innerHTML=pgFin();
+}
+
+function av(p,sz=42){
+  const s=`width:${sz}px;height:${sz}px;border-radius:50%;flex-shrink:0;`;
+  if(p?.photo)return`<img src="${p.photo}" style="${s}object-fit:cover;border:2px solid var(--p)">`;
+  return`<div style="${s}background:linear-gradient(135deg,#00d4ff,#1a6fff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:${sz*.37}px">${(p?.name||'?').charAt(0)}</div>`;
+}
+function grpLabel(g){return g?`${g.name} (${fmTime(g.time)})`:'—';}
+
+// DASHBOARD
+function pgDash(){
+  const now=new Date(),mo=fmM(now);
+  const fin=mFin(mo),all=PL.all(),grps=GRP.all();
+  const moPaid=PAY.all().filter(p=>p.month===mo);
+  const paidSet=new Set(moPaid.map(p=>p.playerId));
+  const unpaid=all.filter(p=>!paidSet.has(p.id));
+  const td=now.getDay();
+  const todayGrps=grps.filter(g=>g.daysList&&g.daysList.includes(td)).sort((a,b)=>a.time?.localeCompare(b.time));
+  return`<div class="page">
+  <div class="ph">
+    <div><div style="font-size:.8rem;color:var(--muted);margin-bottom:2px">مرحباً 👋</div><h1 class="pt">مصطفى محمد</h1></div>
+    <div style="text-align:left"><div style="font-size:.78rem;color:var(--muted)">${DAY_AR[td]}</div><div style="font-size:.78rem;color:var(--muted)">${now.toLocaleDateString('ar-EG')}</div></div>
+  </div>
+  <div class="sg">
+    <div class="sc" style="border-color:rgba(0,212,255,.25)"><span class="sico">👥</span><div class="sv" style="color:var(--p)">${all.length}</div><div class="sl">إجمالي اللاعبين</div></div>
+    <div class="sc" style="border-color:rgba(0,212,255,.2)"><span class="sico">🏊</span><div class="sv" style="color:var(--info)">${grps.length}</div><div class="sl">المجموعات</div></div>
+    <div class="sc" style="border-color:rgba(0,230,138,.25)"><span class="sico">✅</span><div class="sv" style="color:var(--ok)">${moPaid.length}</div><div class="sl">دفعوا هذا الشهر</div><div class="pb"><div class="pf" style="width:${all.length>0?Math.round(moPaid.length/all.length*100):0}%"></div></div></div>
+    <div class="sc" style="border-color:rgba(255,68,102,.25)"><span class="sico">⏳</span><div class="sv" style="color:var(--err)">${unpaid.length}</div><div class="sl">لم يدفعوا بعد</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px" class="fgrid">
+    <div class="fc tot"><div class="fci">💵</div><div class="fcl">إجمالي محصّل</div><div class="fca" style="color:var(--p)">${fin.col.toLocaleString()}</div><div class="fcs">جنيه</div></div>
+    <div class="fc club"><div class="fci">🏢</div><div class="fcl">حساب النادي</div><div class="fca" style="color:var(--warn)">${fin.cl.toLocaleString()}</div><div class="fcs">جنيه — التزام</div></div>
+    <div class="fc coa"><div class="fci">🧑‍🏫</div><div class="fcl">حسابي (مصطفى)</div><div class="fca" style="color:${fin.coach>=0?'var(--ok)':'var(--err)'}">${fin.coach.toLocaleString()}</div><div class="fcs">جنيه</div></div>
+  </div>
+  ${todayGrps.length>0?`<div class="card" style="margin-bottom:16px;border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)">
+    <div style="font-size:.75rem;color:var(--p);font-weight:700;margin-bottom:10px">📅 مجموعات اليوم — ${DAY_AR[td]}</div>
+    ${todayGrps.map(g=>{const gp=all.filter(p=>p.groupId===g.id);return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div><div style="font-weight:700;font-size:.9rem">${g.name}</div><div style="font-size:.76rem;color:var(--muted)">${fmTime(g.time)} • ${gp.length} لاعب</div></div>
+      <button class="btn btn-p btn-sm" onclick="quickAtt('${g.id}')">تسجيل الحضور</button>
+    </div>`}).join('')}
+  </div>`:''}
+  <div class="card">
+    <div style="font-size:.9rem;font-weight:700;margin-bottom:12px;color:${unpaid.length>0?'var(--err)':'var(--ok)'}">
+      ${unpaid.length>0?`⚠️ لم يدفعوا (${now.toLocaleDateString('ar-EG',{month:'long',year:'numeric'})}) — ${unpaid.length} لاعب`:'✅ جميع اللاعبين دفعوا هذا الشهر!'}
+    </div>
+    ${unpaid.length===0?`<div style="text-align:center;padding:14px;font-size:2rem">🎉</div>`:
+    unpaid.slice(0,8).map(p=>{const g=GRP.all().find(x=>x.id===p.groupId);return`<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">${av(p,34)}<div style="flex:1"><div style="font-weight:700;font-size:.86rem">${p.name}</div><div style="font-size:.72rem;color:var(--muted)">${g?grpLabel(g):'بدون مجموعة'}</div></div><button class="btn btn-s btn-sm" onclick="openPay('${p.id}')">تسجيل دفع</button></div>`}).join('')}
+    ${unpaid.length>8?`<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:8px">و ${unpaid.length-8} آخرين...</div>`:''}
+  </div>
+  </div>`;
+}
+
+// PLAYERS
+function pgPlayers(){
+  const mo=fmM(new Date());
+  const paidSet=new Set(PAY.all().filter(p=>p.month===mo).map(p=>p.playerId));
+  return`<div class="page">
+  <div class="ph"><h1 class="pt">👥 اللاعبون</h1><button class="btn btn-p" onclick="openAddPl()">+ إضافة لاعب</button></div>
+  <div class="swrap"><span class="sico">🔍</span><input class="fi" id="sq" type="text" placeholder="بحث بالاسم أو الرقم..." oninput="filterPl()"></div>
+  <div id="plList">${renderPL(PL.all(),paidSet)}</div>
+  </div>`;
+}
+function renderPL(list,paidSet){
+  if(!list.length)return`<div class="empty"><span class="eico">🏊</span><div class="etit">لا يوجد لاعبون بعد</div><div class="esub">ابدأ بإضافة أول لاعب</div><button class="btn btn-p" onclick="openAddPl()">+ إضافة لاعب</button></div>`;
+  return list.map(p=>{
+    const g=GRP.all().find(x=>x.id===p.groupId),paid=paidSet?paidSet.has(p.id):false;
+    return`<div class="pi" onclick="viewPl('${p.id}')">${av(p,40)}<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.9rem">${p.name}</div><div style="font-size:.74rem;color:var(--muted)">${p.age} سنة • ${g?grpLabel(g):'بدون مجموعة'}</div><div style="font-size:.74rem;color:var(--muted)">📞 ${p.phone}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0"><span class="badge ${paid?'bs':'be'}">${paid?'✓ دفع':'✗ لم يدفع'}</span><div style="display:flex;gap:4px"><button class="btn btn-g btn-sm" onclick="event.stopPropagation();openEditPl('${p.id}')">✏️</button><button class="btn btn-d btn-sm" onclick="event.stopPropagation();confDel('${p.id}','player')">🗑️</button></div></div></div>`;
+  }).join('');
+}
+function filterPl(){
+  const q=document.getElementById('sq').value.toLowerCase();
+  const mo=fmM(new Date());
+  const paidSet=new Set(PAY.all().filter(p=>p.month===mo).map(p=>p.playerId));
+  document.getElementById('plList').innerHTML=renderPL(PL.all().filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q)),paidSet);
+}
+
+// GROUPS
+function pgGroups(){
+  const all=PL.all(),grps=GRP.all();
+  return`<div class="page">
+  <div class="ph"><h1 class="pt">🏊 المجموعات</h1><button class="btn btn-p" onclick="openAddGrp()">+ إضافة مجموعة</button></div>
+  ${grps.length===0?`<div class="empty"><span class="eico">🏊</span><div class="etit">لا توجد مجموعات بعد</div><div class="esub">أضف أول مجموعة الآن</div><button class="btn btn-p" onclick="openAddGrp()">+ إضافة مجموعة</button></div>`:''}
+  ${grps.map(g=>{
+    const gp=all.filter(p=>p.groupId===g.id);
+    const tot=gp.reduce((s,p)=>s+(p.subAmt||SUB),0),cl=clubOb(gp.length),co=tot-cl;
+    const dayNames=(g.daysList||[]).map(d=>DAY_AR[d]).join(' & ');
+    return`<div class="gc">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin-bottom:13px">
+        <div>
+          <div style="font-size:1rem;font-weight:800">${g.name}</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">📅 ${dayNames||'—'} &nbsp; 🕕 ${fmTime(g.time)}</div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center">
+          <span class="badge ${gp.length<=4?'bw':gp.length<=6?'bs':'bi2'}">${gp.length} لاعب</span>
+          <button class="btn btn-d btn-sm" onclick="confDel('${g.id}','group')">🗑️</button>
+        </div>
+      </div>
+      <div class="fmini" style="margin-bottom:12px">
+        <div class="fmi"><div class="fmil">إجمالي (لو كل دفع)</div><div class="fmiv" style="color:var(--p)">${tot.toLocaleString()}</div></div>
+        <div class="fmi"><div class="fmil">حصة النادي</div><div class="fmiv" style="color:var(--warn)">${cl.toLocaleString()}</div></div>
+        <div class="fmi"><div class="fmil">حصة مصطفى</div><div class="fmiv" style="color:${co>=0?'var(--ok)':'var(--err)'}">${co.toLocaleString()}</div></div>
+      </div>
+      ${gp.length>0?`<div class="slbl">اللاعبون</div><div style="display:flex;flex-wrap:wrap;gap:6px">${gp.map(p=>`<div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--borderS);border-radius:8px;padding:4px 9px;cursor:pointer" onclick="viewPl('${p.id}')">${av(p,20)}<span style="font-size:.8rem;font-weight:600">${p.name}</span></div>`).join('')}</div>`:
+      `<div style="color:var(--muted);text-align:center;padding:10px;font-size:.82rem">لا يوجد لاعبون في هذه المجموعة</div>`}
+    </div>`;
+  }).join('')}
+  ${grps.length>0?`<div class="card" style="margin-top:4px">
+    <div style="font-size:.88rem;font-weight:700;margin-bottom:11px">📊 جدول أسعار النادي</div>
+    <table><thead><tr><th>حجم المجموعة</th><th>سعر/ساعة</th><th>الشهري (8 تمرينات)</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge bw">4 أو أقل</span></td><td>50 ج × عدد الأفراد</td><td style="color:var(--warn);font-weight:700">400 ج × عدد الأفراد</td></tr>
+      <tr><td><span class="badge bs">5 أو 6</span></td><td>275 ج ثابتة</td><td style="color:var(--ok);font-weight:700">2,200 ج ثابتة</td></tr>
+      <tr><td><span class="badge bi2">أكثر من 6</span></td><td>275 + 50×(ن-6) ج</td><td style="color:var(--info);font-weight:700">(275+50×(ن-6))×8 ج</td></tr>
+    </tbody></table>
+  </div>`:''}
+  </div>`;
+}
+
+// ATTENDANCE
+function pgAtt(){
+  const hist=AT.all().slice().reverse();
+  return`<div class="page">
+  <div class="ph"><h1 class="pt">✅ الحضور</h1><button class="btn btn-p" onclick="openAttM()">+ تسجيل جديد</button></div>
+  ${sess?renderSess():''}
+  <div class="card">
+    <div style="font-size:.88rem;font-weight:700;margin-bottom:12px">📋 سجل الحضور</div>
+    ${hist.length===0?`<div class="empty" style="padding:26px"><span class="eico" style="font-size:2.2rem">📅</span><div class="etit">لا يوجد سجلات بعد</div></div>`:
+    hist.map(s=>{
+      const g=GRP.all().find(x=>x.id===s.groupId),pr=s.present||[],ab=s.absent||[],allPl=PL.all();
+      return`<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div><div style="font-weight:700;font-size:.86rem">${new Date(s.date+'T00:00:00').toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+          <div style="font-size:.73rem;color:var(--muted)">${g?grpLabel(g):'—'}</div></div>
+          <div style="display:flex;gap:5px"><span class="badge bs">✓ ${pr.length}</span><span class="badge be">✗ ${ab.length}</span></div>
+        </div>
+        <div>${pr.map(id=>{const p=allPl.find(x=>x.id===id);return p?`<span class="npill p">${p.name}</span>`:''}).join('')}${ab.map(id=>{const p=allPl.find(x=>x.id===id);return p?`<span class="npill a">${p.name}</span>`:''}).join('')}</div>
+      </div>`;
+    }).join('')}
+  </div>
+  </div>`;
+}
+function renderSess(){
+  const{date,groupId,records}=sess;
+  const g=GRP.all().find(x=>x.id===groupId);
+  const gp=PL.all().filter(p=>p.groupId===groupId);
+  const prC=Object.values(records).filter(v=>v==='present').length;
+  const abC=Object.values(records).filter(v=>v==='absent').length;
+  return`<div class="card" style="margin-bottom:16px;border-color:rgba(0,212,255,.35);background:rgba(0,212,255,.04)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin-bottom:13px">
+      <div><div style="font-size:.72rem;color:var(--p);font-weight:700;margin-bottom:2px">▶ جارٍ تسجيل الحضور</div>
+        <div style="font-weight:800">${g?grpLabel(g):'—'}</div>
+        <div style="font-size:.76rem;color:var(--muted)">${new Date(date+'T00:00:00').toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'})}</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+        <span class="badge bs">✓ ${prC}</span><span class="badge be">✗ ${abC}</span>
+        <button class="btn btn-p btn-sm" onclick="saveAtt()">💾 حفظ</button>
+        <button class="btn btn-g btn-sm" onclick="cancelSess()">✕</button>
+      </div>
+    </div>
+    ${gp.length===0?'<div style="text-align:center;color:var(--muted);padding:16px">لا يوجد لاعبون في هذه المجموعة</div>':''}
+    ${gp.map(p=>{const st=records[p.id]||'none';return`<div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)">${av(p,38)}<div style="flex:1"><div style="font-weight:700">${p.name}</div><div style="font-size:.72rem;color:var(--muted)">${p.age} سنة</div></div><div style="display:flex;gap:6px"><button class="ab pb${st==='present'?' on':''}" onclick="markA('${p.id}','present')">✓</button><button class="ab xb${st==='absent'?' on':''}" onclick="markA('${p.id}','absent')">✗</button></div></div>`;}).join('')}
+    ${gp.length>0?`<div style="display:flex;gap:7px;margin-top:11px"><button class="btn btn-s" style="flex:1;font-size:.8rem" onclick="allPr()">✓ الكل حاضر</button><button class="btn btn-d" style="flex:1;font-size:.8rem" onclick="allAb()">✗ الكل غائب</button></div>`:''}
+  </div>`;
+}
+
+// FINANCE
+function pgFin(){
+  if(!finMo)finMo=fmM(new Date());
+  return`<div class="page">
+  <div class="ph"><h1 class="pt">💰 المالية</h1></div>
+  <div style="margin-bottom:16px;display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+    <label class="fl" style="margin:0;white-space:nowrap">الشهر:</label>
+    <input class="fi" type="month" id="finM" value="${finMo}" onchange="chFin(this.value)" style="width:auto;min-width:165px">
+  </div>
+  <div id="finC">${renderFin(finMo)}</div>
+  </div>`;
+}
+function renderFin(mo){
+  const fin=mFin(mo),all=PL.all(),moPay=PAY.all().filter(p=>p.month===mo);
+  return`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:18px" class="fg3">
+    <div class="fc tot"><div class="fci">💵</div><div class="fcl">إجمالي محصّل</div><div class="fca" style="color:var(--p)">${fin.col.toLocaleString()}</div><div class="fcs">جنيه</div></div>
+    <div class="fc club"><div class="fci">🏢</div><div class="fcl">حساب النادي</div><div class="fca" style="color:var(--warn)">${fin.cl.toLocaleString()}</div><div class="fcs">جنيه — التزام</div></div>
+    <div class="fc coa"><div class="fci">🧑‍🏫</div><div class="fcl">حسابي (مصطفى)</div><div class="fca" style="color:${fin.coach>=0?'var(--ok)':'var(--err)'}">${fin.coach.toLocaleString()}</div><div class="fcs">جنيه</div></div>
+  </div>
+  ${fin.det.length===0?`<div class="empty"><span class="eico">📊</span><div class="etit">لا توجد مجموعات بعد</div></div>`:''}
+  ${fin.det.map(g=>{
+    const gp=all.filter(p=>p.groupId===g.id);
+    return`<div class="card" style="margin-bottom:13px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+        <div><div style="font-size:.96rem;font-weight:800">${g.name}</div><div style="font-size:.74rem;color:var(--muted)">${fmTime(g.time)} • ${(g.daysList||[]).map(d=>DAY_AR[d]).join(' & ')}</div></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap"><span class="badge bp">${g.pc} لاعب</span><span class="badge bs">دفع: ${g.paid}</span><span class="badge be">لم يدفع: ${g.pc-g.paid}</span></div>
+      </div>
+      <div class="fmini" style="margin-bottom:11px">
+        <div class="fmi"><div class="fmil">محصّل فعلي</div><div class="fmiv" style="color:var(--p)">${g.col.toLocaleString()}</div></div>
+        <div class="fmi"><div class="fmil">النادي</div><div class="fmiv" style="color:var(--warn)">${g.cl.toLocaleString()}</div></div>
+        <div class="fmi"><div class="fmil">مصطفى</div><div class="fmiv" style="color:${g.coach>=0?'var(--ok)':'var(--err)'}">${g.coach.toLocaleString()}</div></div>
+      </div>
+      ${gp.map(p=>{const pay=moPay.find(x=>x.playerId===p.id);return`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)">${av(p,30)}<div style="flex:1;min-width:0"><div style="font-size:.86rem;font-weight:700">${p.name}</div>${pay?`<div style="font-size:.7rem;color:var(--muted)">دفع في ${new Date(pay.date).toLocaleDateString('ar-EG')}</div>`:''}</div><div style="display:flex;align-items:center;gap:5px"><span class="badge ${pay?'bs':'be'}">${pay?`✓ ${pay.amount||700} ج`:'✗ لم يدفع'}</span>${!pay?`<button class="btn btn-s btn-sm" onclick="openPay('${p.id}')">تسجيل</button>`:`<button class="btn btn-g btn-sm" onclick="delPay('${pay.id}')" title="حذف">🗑️</button>`}</div></div>`;}).join('')}
+    </div>`;
+  }).join('')}`;
+}
+function chFin(v){finMo=v;document.getElementById('finC').innerHTML=renderFin(v);}
+
+// GROUP ACTIONS
+function openAddGrp(){
+  editGrpId=null;
+  document.getElementById('modGT').textContent='+ إضافة مجموعة جديدة';
+  document.getElementById('gName').value='';
+  document.getElementById('gTime').value='18:00';
+  document.querySelectorAll('.day-pill').forEach(el=>{el.classList.remove('checked');el.querySelector('input').checked=false;});
+  openM('modGroup');
+}
+function toggleDay(el){
+  const cb=el.querySelector('input');
+  cb.checked=!cb.checked;
+  el.classList.toggle('checked',cb.checked);
+}
+function saveGroup(){
+  const name=document.getElementById('gName').value.trim();
+  const time=document.getElementById('gTime').value;
+  const checked=[...document.querySelectorAll('.day-pill input:checked')].map(cb=>+cb.value);
+  if(!name){toast('يرجى كتابة اسم المجموعة','err');return;}
+  if(checked.length===0){toast('يرجى اختيار يوم واحد على الأقل','err');return;}
+  if(!time){toast('يرجى تحديد وقت التمرين','err');return;}
+  const dayNames=checked.map(d=>DAY_AR[d]);
+  const grps=GRP.all();
+  grps.push({id:uid(),name,time,daysList:checked,days:dayNames.join(' & ')});
+  GRP.save(grps);
+  closeM('modGroup');toast('تمت إضافة المجموعة بنجاح ✓');render();
+}
+function deleteGroup(id){
+  // Remove group and unassign players
+  GRP.save(GRP.all().filter(g=>g.id!==id));
+  const pls=PL.all().map(p=>p.groupId===id?{...p,groupId:''}:p);
+  PL.save(pls);
+  toast('تم حذف المجموعة');render();
+}
+
+// PLAYER ACTIONS
+function populateGroupSelect(selId,selected=''){
+  const sel=document.getElementById(selId);
+  if(!sel)return;
+  const grps=GRP.all();
+  sel.innerHTML=grps.length===0?'<option value="">لا توجد مجموعات — أضف مجموعة أولاً</option>':
+    grps.map(g=>`<option value="${g.id}" ${g.id===selected?'selected':''}>${grpLabel(g)}</option>`).join('');
+}
+function openAddPl(){
+  editId=null;photo=null;
+  document.getElementById('modPT').textContent='+ إضافة لاعب جديد';
+  document.getElementById('fName').value='';document.getElementById('fAge').value='';
+  document.getElementById('fPhone').value='';document.getElementById('fJoin').value=tod();
+  document.getElementById('fSub').value='700';
+  document.getElementById('puc').innerHTML='<span style="font-size:1.9rem;color:var(--muted)">📷</span>';
+  populateGroupSelect('fGroup');
+  openM('modPlayer');
+}
+function openEditPl(id){
+  const p=PL.all().find(x=>x.id===id);if(!p)return;
+  editId=id;photo=p.photo||null;
+  document.getElementById('modPT').textContent='✏️ تعديل بيانات اللاعب';
+  document.getElementById('fName').value=p.name;document.getElementById('fAge').value=p.age;
+  document.getElementById('fPhone').value=p.phone;document.getElementById('fJoin').value=p.joinDate;
+  document.getElementById('fSub').value=p.subAmt||'700';
+  document.getElementById('puc').innerHTML=p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover">`:'<span style="font-size:1.9rem;color:var(--muted)">📷</span>';
+  populateGroupSelect('fGroup',p.groupId);
+  openM('modPlayer');
+}
+function onPhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{photo=ev.target.result;document.getElementById('puc').innerHTML=`<img src="${photo}" style="width:100%;height:100%;object-fit:cover">`};r.readAsDataURL(f);}
+function savePlayer(){
+  const name=document.getElementById('fName').value.trim();
+  const age=document.getElementById('fAge').value;
+  const phone=document.getElementById('fPhone').value.trim();
+  const join=document.getElementById('fJoin').value;
+  const grp=document.getElementById('fGroup').value;
+  const subAmt=+document.getElementById('fSub').value||700;
+  if(!name||!age||!phone||!join){toast('يرجى ملء جميع الحقول المطلوبة','err');return;}
+  const all=PL.all();
+  if(editId){const i=all.findIndex(p=>p.id===editId);all[i]={...all[i],name,age:+age,phone,joinDate:join,groupId:grp,subAmt,photo};toast('تم تعديل بيانات اللاعب ✓');}
+  else{all.push({id:uid(),name,age:+age,phone,joinDate:join,groupId:grp,subAmt,photo});toast('تمت إضافة اللاعب بنجاح ✓');}
+  PL.save(all);closeM('modPlayer');render();
+}
+
+function confDel(id,type){
+  let msg='',fn;
+  if(type==='player'){const p=PL.all().find(x=>x.id===id);msg=`هل تريد حذف اللاعب "${p?.name}" نهائياً؟`;fn=()=>{PL.save(PL.all().filter(p=>p.id!==id));toast('تم حذف اللاعب');render();}}
+  else{const g=GRP.all().find(x=>x.id===id);msg=`هل تريد حذف المجموعة "${g?.name}" نهائياً؟ سيتم إلغاء تعيين لاعبيها.`;fn=()=>{deleteGroup(id);}}
+  document.getElementById('confMsg').textContent=msg;
+  document.getElementById('confOk').onclick=()=>{fn();closeM('modConfirm');};
+  openM('modConfirm');
+}
+
+function viewPl(id){
+  const p=PL.all().find(x=>x.id===id);if(!p)return;
+  const g=GRP.all().find(x=>x.id===p.groupId);
+  const att=AT.all();let tot=0,pr=0;
+  att.forEach(s=>{if(s.groupId===p.groupId){tot++;if((s.present||[]).includes(id))pr++;}});
+  const pct=tot>0?Math.round(pr/tot*100):0;
+  const pays=PAY.all().filter(x=>x.playerId===id).sort((a,b)=>b.month.localeCompare(a.month));
+  document.getElementById('detBody').innerHTML=`
+    <div style="text-align:center;margin-bottom:16px">
+      ${p.photo?`<img src="${p.photo}" style="width:78px;height:78px;border-radius:50%;object-fit:cover;border:3px solid var(--p);margin-bottom:8px">`:`<div style="width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#1a6fff);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:#fff;margin:0 auto 8px">${p.name.charAt(0)}</div>`}
+      <h2 style="font-size:1.2rem;font-weight:900">${p.name}</h2>
+      <div style="color:var(--muted);font-size:.8rem;margin-top:3px">${g?grpLabel(g):'بدون مجموعة'} • ${p.age} سنة</div>
+      <div style="color:var(--muted);font-size:.78rem;margin-top:2px">📞 ${p.phone}</div>
+      <div style="color:var(--muted);font-size:.75rem;margin-top:2px">انضم في ${new Date(p.joinDate+'T00:00:00').toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="dstat"><div class="dstv" style="color:var(--ok)">${pct}%</div><div class="dstl">نسبة الحضور<br>${pr}/${tot} تمرين</div></div>
+      <div class="dstat"><div class="dstv" style="color:var(--p)">${(pays.reduce((s,x)=>s+(x.amount||SUB),0)).toLocaleString()}</div><div class="dstl">إجمالي مدفوع<br>${pays.length} شهر</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-s" style="flex:1" onclick="openPay('${id}')">💳 تسجيل دفعة</button>
+      <button class="btn btn-g" style="flex:1" onclick="closeM('modDetail');openEditPl('${id}')">✏️ تعديل</button>
+    </div>
+    <div class="dvd"></div>
+    <div class="slbl" style="margin-top:10px;margin-bottom:6px">سجل الدفعات</div>
+    ${pays.length===0?'<div style="color:var(--muted);text-align:center;font-size:.8rem;padding:12px">لا يوجد دفعات مسجلة</div>':
+    pays.map(pay=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.8rem"><span style="color:var(--muted)">${new Date(pay.month+'-01').toLocaleDateString('ar-EG',{month:'long',year:'numeric'})}</span><div style="display:flex;align-items:center;gap:6px"><span class="badge bs">${pay.amount||700} ج</span><span style="font-size:.7rem;color:var(--muted)">${new Date(pay.date).toLocaleDateString('ar-EG')}</span><button class="btn btn-d btn-sm" onclick="delPay('${pay.id}');closeM('modDetail');viewPl('${id}')">🗑️</button></div></div>`).join('')}`;
+  openM('modDetail');
+}
+
+// ATTENDANCE
+function openAttM(){
+  document.getElementById('attDate').value=tod();
+  populateGroupSelect('attGroup');
+  openM('modAtt');
+}
+function quickAtt(gid){sess={date:tod(),groupId:gid,records:{}};goto('attendance');}
+function beginAtt(){
+  const date=document.getElementById('attDate').value,gid=document.getElementById('attGroup').value;
+  if(!date){toast('يرجى اختيار التاريخ','err');return;}
+  if(!gid){toast('يرجى اختيار المجموعة','err');return;}
+  sess={date,groupId:gid,records:{}};closeM('modAtt');render();
+}
+function markA(pid,st){if(!sess)return;sess.records[pid]===st?delete sess.records[pid]:sess.records[pid]=st;render();}
+function allPr(){if(!sess)return;PL.all().filter(p=>p.groupId===sess.groupId).forEach(p=>sess.records[p.id]='present');render();}
+function allAb(){if(!sess)return;PL.all().filter(p=>p.groupId===sess.groupId).forEach(p=>sess.records[p.id]='absent');render();}
+function saveAtt(){
+  if(!sess)return;
+  const{date,groupId,records}=sess;
+  const gp=PL.all().filter(p=>p.groupId===groupId);
+  const present=gp.filter(p=>records[p.id]==='present').map(p=>p.id);
+  const absent=gp.filter(p=>records[p.id]!=='present').map(p=>p.id);
+  const all=AT.all();
+  const ei=all.findIndex(s=>s.date===date&&s.groupId===groupId);
+  const s={id:uid(),date,groupId,present,absent};
+  if(ei>=0)all[ei]=s;else all.push(s);
+  AT.save(all);sess=null;toast('تم حفظ الحضور بنجاح ✓');render();
+}
+function cancelSess(){sess=null;render();}
+
+// PAYMENT
+function openPay(pid){
+  payId=pid;
+  const p=PL.all().find(x=>x.id===pid);
+  const g=GRP.all().find(x=>x.id===p?.groupId);
+  const now=new Date();
+  document.getElementById('payInfo').innerHTML=`<div style="display:flex;align-items:center;gap:8px">${av(p,34)}<div><div style="font-weight:700">${p?.name}</div><div style="font-size:.75rem;color:var(--muted)">${g?grpLabel(g):'—'}</div></div></div>`;
+  document.getElementById('payMonth').value=fmM(now);
+  document.getElementById('payDate').value=tod();
+  document.getElementById('payAmt').value=p?.subAmt||700;
+  openM('modPay');closeM('modDetail');
+}
+function confirmPay(){
+  const mo=document.getElementById('payMonth').value,date=document.getElementById('payDate').value;
+  const amt=+document.getElementById('payAmt').value||700;
+  if(!mo||!date){toast('يرجى ملء جميع الحقول','err');return;}
+  if(PAY.all().find(p=>p.playerId===payId&&p.month===mo)){toast('هذا اللاعب دفع بالفعل هذا الشهر!','err');return;}
+  const all=PAY.all();all.push({id:uid(),playerId:payId,month:mo,date,amount:amt});
+  PAY.save(all);closeM('modPay');toast('تم تسجيل الدفعة بنجاح ✓');render();
+}
+function delPay(pid){
+  PAY.save(PAY.all().filter(p=>p.id!==pid));toast('تم حذف الدفعة');
+  if(curPage==='finance'){const el=document.getElementById('finC');if(el)el.innerHTML=renderFin(finMo||fmM(new Date()));}
+  else render();
+}
+
+// UTILS
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className=`toast t${type} vis`;
+  setTimeout(()=>el.classList.remove('vis'),3000);
+}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeM(o.id);}));
+
+goto('dashboard');
+</script>
+</body>
+</html>
