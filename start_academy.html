@@ -340,6 +340,10 @@ const db={
 
 const F_KEYS = ['ac_pl', 'ac_at', 'ac_pay', 'ac_grp', 'ac_auth'];
 let isInitialSyncDone = false;
+
+// Initial render from local storage (Offline First)
+render();
+
 database.ref('/').once('value').then(snap => {
   const data = snap.val();
   if (!data) {
@@ -360,6 +364,9 @@ database.ref('/').once('value').then(snap => {
   });
   isInitialSyncDone = true;
   render();
+}).catch(err => {
+  console.error("Firebase Sync Error:", err);
+  toast('تعذر الاتصال بقاعدة البيانات، تعمل الآن في وضع الأوفلاين','err');
 });
 
 const PL={all:()=>db.g('ac_pl'),save:v=>db.s('ac_pl',v)};
