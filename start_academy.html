@@ -210,6 +210,7 @@ tr:hover td{background:rgba(0,212,255,.02)}
     <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
       <button class="btn btn-s" style="background:rgba(0,230,138,.1);border-color:var(--ok)" onclick="exportExcel()" style="padding:12px;font-size:.95rem">📊 تصدير اللاعبين لإكسيل (Excel)</button>
       <button class="btn btn-w" onclick="changePass()" style="padding:12px;font-size:.95rem">🔑 تغيير كلمة المرور</button>
+      <button class="btn btn-d" onclick="logout()" style="padding:12px;font-size:.95rem">🚪 تسجيل الخروج</button>
     </div>
     <button class="btn btn-g" style="width:100%" onclick="closeM('modBackup')">إغلاق</button>
   </div>
@@ -849,12 +850,19 @@ function exportExcel(){
 // AUTH
 function initAuth(){
   const auth=db.g('ac_auth',null);
+  const loggedIn=localStorage.getItem('ac_logged_in');
+  
   if(!auth){
     document.getElementById('authTitle').textContent='إعداد كلمة المرور';
     document.getElementById('authSub').textContent='لأول مرة، قم بإنشاء كلمة مرور لحماية بياناتك';
   } else {
-    document.getElementById('authTitle').textContent='تسجيل الدخول';
-    document.getElementById('authSub').textContent='أدخل كلمة المرور للدخول للأكاديمية';
+    if(loggedIn==='1'){
+      document.getElementById('authScreen').style.display='none';
+    } else {
+      document.getElementById('authScreen').style.display='flex';
+      document.getElementById('authTitle').textContent='تسجيل الدخول';
+      document.getElementById('authSub').textContent='أدخل كلمة المرور للدخول للأكاديمية';
+    }
   }
 }
 function checkAuth(){
@@ -863,10 +871,12 @@ function checkAuth(){
   const auth=db.g('ac_auth',null);
   if(!auth){
     db.s('ac_auth',pin);
+    localStorage.setItem('ac_logged_in','1');
     toast('تم تعيين كلمة المرور ✓');
     document.getElementById('authScreen').style.display='none';
   }else{
     if(pin===auth){
+      localStorage.setItem('ac_logged_in','1');
       document.getElementById('authScreen').style.display='none';
     }else{
       toast('كلمة المرور خاطئة!','err');
@@ -875,7 +885,16 @@ function checkAuth(){
 }
 function changePass(){
   const p=prompt('أدخل كلمة المرور الجديدة:');
-  if(p&&p.trim()){db.s('ac_auth',p.trim());toast('تم تغيير كلمة المرور ✓');}
+  if(p&&p.trim()){
+    db.s('ac_auth',p.trim());
+    localStorage.removeItem('ac_logged_in');
+    toast('تم تغيير كلمة المرور، يرجى تسجيل الدخول من جديد ✓');
+    setTimeout(()=>location.reload(),1000);
+  }
+}
+function logout(){
+  localStorage.removeItem('ac_logged_in');
+  location.reload();
 }
 
 // UTILS
