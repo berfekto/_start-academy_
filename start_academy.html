@@ -145,9 +145,22 @@ tr:hover td{background:rgba(0,212,255,.02)}
 .day-pill{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;border:1px solid var(--borderS);cursor:pointer;font-size:.8rem;transition:all var(--tr);background:rgba(255,255,255,.03)}
 .day-pill input{display:none}
 .day-pill.checked{background:rgba(0,212,255,.15);border-color:var(--p);color:var(--p);font-weight:700}
+.auth-ov{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+.auth-box{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:30px;width:100%;max-width:360px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
 </style>
 </head>
 <body>
+
+<!-- Auth Screen -->
+<div class="auth-ov" id="authScreen">
+  <div class="auth-box">
+    <div style="font-size:3.5rem;margin-bottom:10px">🔒</div>
+    <h2 class="mt" id="authTitle" style="margin-bottom:8px">تسجيل الدخول</h2>
+    <p style="color:var(--muted);font-size:.8rem;margin-bottom:20px" id="authSub">أدخل كلمة المرور للدخول للأكاديمية</p>
+    <input type="password" class="fi" id="authPin" placeholder="كلمة المرور..." style="text-align:center;font-size:1.2rem;letter-spacing:4px;margin-bottom:15px">
+    <button class="btn btn-p" style="width:100%;padding:10px" onclick="checkAuth()">دخول</button>
+  </div>
+</div>
 
 <nav class="sidebar">
   <div class="slogo">
@@ -174,6 +187,31 @@ tr:hover td{background:rgba(0,212,255,.02)}
 </nav>
 
 <main class="main" id="app"></main>
+
+<!-- Modal: Backup -->
+<div class="ov" id="modBackup">
+  <div class="mbox" style="max-width:400px;text-align:center">
+    <div style="font-size:3rem;margin-bottom:10px">🔄</div>
+    <h2 class="mt">مزامنة ونسخ البيانات</h2>
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:20px;line-height:1.5">
+      بما إن النظام مجاني وبيشتغل بدون سيرفرات، البيانات بتتحفظ على الجهاز اللي بتسجل منه بس.<br>
+      عشان تنقل البيانات من الكمبيوتر للموبايل (أو العكس)، نزل البيانات من هنا وارفعها على الجهاز التاني.
+    </p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <button class="btn btn-p" onclick="exportData()" style="padding:12px;font-size:.95rem">⬇️ تحميل البيانات (تصدير)</button>
+      <div style="position:relative">
+        <input type="file" id="fImport" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn btn-s" onclick="document.getElementById('fImport').click()" style="width:100%;padding:12px;font-size:.95rem">⬆️ رفع البيانات (استيراد)</button>
+      </div>
+    </div>
+    <div class="dvd"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <button class="btn btn-s" style="background:rgba(0,230,138,.1);border-color:var(--ok)" onclick="exportExcel()" style="padding:12px;font-size:.95rem">📊 تصدير اللاعبين لإكسيل (Excel)</button>
+      <button class="btn btn-w" onclick="changePass()" style="padding:12px;font-size:.95rem">🔑 تغيير كلمة المرور</button>
+    </div>
+    <button class="btn btn-g" style="width:100%" onclick="closeM('modBackup')">إغلاق</button>
+  </div>
+</div>
 
 <!-- Modal: Player -->
 <div class="ov" id="modPlayer">
@@ -346,7 +384,7 @@ function pgDash(){
   return`<div class="page">
   <div class="ph">
     <div><div style="font-size:.8rem;color:var(--muted);margin-bottom:2px">مرحباً 👋</div><h1 class="pt">مصطفى محمد</h1></div>
-    <div style="text-align:left"><div style="font-size:.78rem;color:var(--muted)">${DAY_AR[td]}</div><div style="font-size:.78rem;color:var(--muted)">${now.toLocaleDateString('ar-EG')}</div></div>
+    <div style="display:flex;align-items:center;gap:10px;text-align:left"><button class="btn btn-g btn-sm" onclick="openM('modBackup')" title="مزامنة ونسخ احتياطي">🔄</button><div><div style="font-size:.78rem;color:var(--muted)">${DAY_AR[td]}</div><div style="font-size:.78rem;color:var(--muted)">${now.toLocaleDateString('ar-EG')}</div></div></div>
   </div>
   <div class="sg">
     <div class="sc" style="border-color:rgba(0,212,255,.25)"><span class="sico">👥</span><div class="sv" style="color:var(--p)">${all.length}</div><div class="sl">إجمالي اللاعبين</div></div>
@@ -702,6 +740,81 @@ function delPay(pid){
   else render();
 }
 
+// BACKUP & RESTORE
+function exportData(){
+  const data={pl:PL.all(),grp:GRP.all(),att:AT.all(),pay:PAY.all()};
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`start_academy_backup_${tod()}.json`;
+  a.click();URL.revokeObjectURL(url);
+  toast('تم تحميل البيانات بنجاح ✓');
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(data.pl)PL.save(data.pl);
+      if(data.grp)GRP.save(data.grp);
+      if(data.att)AT.save(data.att);
+      if(data.pay)PAY.save(data.pay);
+      toast('تم استيراد البيانات بنجاح! جاري التحديث...');
+      setTimeout(()=>location.reload(),1000);
+    }catch(err){
+      toast('ملف البيانات غير صالح!','err');
+    }
+  };
+  reader.readAsText(file);
+}
+function exportExcel(){
+  const all=PL.all(), grps=GRP.all(), pays=PAY.all();
+  let csv = "الاسم,السن,التليفون,المجموعة,قيمة الاشتراك,تاريخ الانضمام,إجمالي المدفوع\n";
+  all.forEach(p => {
+    const g = grps.find(x=>x.id===p.groupId);
+    const gName = g ? g.name : 'بدون مجموعة';
+    const pPays = pays.filter(x=>x.playerId===p.id);
+    const totalPaid = pPays.reduce((s,x)=>s+(x.amount||700),0);
+    csv += `${p.name},${p.age},${p.phone},${gName},${p.subAmt||700},${p.joinDate},${totalPaid}\n`;
+  });
+  const blob = new Blob(["\uFEFF"+csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `players_report_${tod()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('تم التصدير لإكسيل ✓');
+}
+
+// AUTH
+function initAuth(){
+  const auth=db.g('ac_auth',null);
+  if(!auth){
+    document.getElementById('authTitle').textContent='إعداد كلمة المرور';
+    document.getElementById('authSub').textContent='لأول مرة، قم بإنشاء كلمة مرور لحماية بياناتك';
+  }
+}
+function checkAuth(){
+  const pin=document.getElementById('authPin').value.trim();
+  if(!pin){toast('أدخل كلمة المرور','err');return;}
+  const auth=db.g('ac_auth',null);
+  if(!auth){
+    db.s('ac_auth',pin);
+    toast('تم تعيين كلمة المرور ✓');
+    document.getElementById('authScreen').style.display='none';
+  }else{
+    if(pin===auth){
+      document.getElementById('authScreen').style.display='none';
+    }else{
+      toast('كلمة المرور خاطئة!','err');
+    }
+  }
+}
+function changePass(){
+  const p=prompt('أدخل كلمة المرور الجديدة:');
+  if(p&&p.trim()){db.s('ac_auth',p.trim());toast('تم تغيير كلمة المرور ✓');}
+}
+
 // UTILS
 function openM(id){document.getElementById(id).classList.add('open');}
 function closeM(id){document.getElementById(id).classList.remove('open');}
@@ -712,6 +825,7 @@ function toast(msg,type='ok'){
 }
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeM(o.id);}));
 
+initAuth();
 goto('dashboard');
 </script>
 </body>
