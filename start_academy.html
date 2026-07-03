@@ -351,8 +351,7 @@ const db={
 const F_KEYS = ['ac_pl', 'ac_at', 'ac_pay', 'ac_grp', 'ac_auth'];
 let isInitialSyncDone = false;
 
-// Initial render from local storage (Offline First)
-render();
+// Removed premature render() to fix ReferenceError. The app is rendered by goto('dashboard') at the bottom of the file.
 
 if (isFirebaseReady && database) {
   database.ref('/').once('value').then(snap => {
