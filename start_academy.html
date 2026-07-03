@@ -491,10 +491,9 @@ function pgPlayers(){
   const paidSet=new Set(PAY.all().filter(p=>p.month===mo).map(p=>p.playerId));
   return`<div class="page">
   <div class="ph"><h1 class="pt">👥 اللاعبون</h1><button class="btn btn-p" onclick="openAddPl()">+ إضافة لاعب</button></div>
-  <div class="swrap"><span class="sico">🔍</span><input class="fi" id="sq" type="text" placeholder="بحث بالاسم أو الرقم..." oninput="filterPl()"></div>
+  <div class="swrap"><span class="sico">🔍</span><input class="fi" id="sq" type="text" placeholder="بحث شامل: الاسم، التليفون، السن، سنة الميلاد، قيمة الاشتراك..." oninput="filterPl()"></div>
   <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
     <select class="fi" id="fGrpFilter" style="flex:1;min-width:120px" onchange="filterPl()"></select>
-    <input class="fi" type="number" id="fAgeFilter" placeholder="سنة الميلاد أو السن" style="flex:1;min-width:120px" oninput="filterPl()">
   </div>
   <div id="plList">${renderPL(PL.all(),paidSet)}</div>
   </div>`;
@@ -507,16 +506,23 @@ function renderPL(list,paidSet){
   }).join('');
 }
 function filterPl(){
-  const q=document.getElementById('sq').value.toLowerCase();
+  const q=document.getElementById('sq').value.toLowerCase().trim();
   const g=document.getElementById('fGrpFilter').value;
-  const a=document.getElementById('fAgeFilter').value;
   const mo=fmM(new Date());
   const paidSet=new Set(PAY.all().filter(p=>p.month===mo).map(p=>p.playerId));
   
   let list = PL.all();
-  if(q) list = list.filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q));
   if(g) list = list.filter(p=>p.groupId===g);
-  if(a) list = list.filter(p=>p.age==a || (p.birth && p.birth.startsWith(a)));
+  if(q) {
+    list = list.filter(p=>{
+      return (p.name&&p.name.toLowerCase().includes(q)) ||
+             (p.phone&&p.phone.includes(q)) ||
+             (p.age&&p.age.toString()===q) ||
+             (p.birth&&p.birth.includes(q)) ||
+             (p.subAmt&&p.subAmt.toString()===q) ||
+             (p.joinDate&&p.joinDate.includes(q));
+    });
+  }
   
   document.getElementById('plList').innerHTML=renderPL(list,paidSet);
 }
