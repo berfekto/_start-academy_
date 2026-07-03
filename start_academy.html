@@ -224,10 +224,13 @@ tr:hover td{background:rgba(0,212,255,.02)}
     <input type="file" id="fPhoto" accept="image/*" style="display:none" onchange="onPhoto(event)">
     <div class="fg"><label class="fl">الاسم الكامل *</label><input class="fi" id="fName" type="text" placeholder="اسم اللاعب"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg"><label class="fl">تاريخ الميلاد</label><input class="fi" id="fBirth" type="date" onchange="calcAge(this.value)"></div>
       <div class="fg"><label class="fl">السن *</label><input class="fi" id="fAge" type="number" min="3" max="60" placeholder="العمر"></div>
-      <div class="fg"><label class="fl">التليفون *</label><input class="fi" id="fPhone" type="tel" placeholder="01XXXXXXXXX"></div>
     </div>
-    <div class="fg"><label class="fl">تاريخ الانضمام *</label><input class="fi" id="fJoin" type="date"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg"><label class="fl">التليفون *</label><input class="fi" id="fPhone" type="tel" placeholder="01XXXXXXXXX"></div>
+      <div class="fg"><label class="fl">تاريخ الانضمام *</label><input class="fi" id="fJoin" type="date"></div>
+    </div>
     <div class="fg"><label class="fl">المجموعة *</label><select class="fi" id="fGroup"></select></div>
     <div class="fg"><label class="fl">قيمة الاشتراك الشهري (جنيه) *</label><input class="fi" id="fSub" type="number" value="700" placeholder="مثال: 700 أو 400"></div>
     <div style="display:flex;gap:8px;margin-top:18px">
@@ -420,7 +423,13 @@ function goto(p){
 function render(){
   const app=document.getElementById('app');
   if(curPage==='dashboard')app.innerHTML=pgDash();
-  else if(curPage==='players')app.innerHTML=pgPlayers();
+  else if(curPage==='players'){
+    app.innerHTML=pgPlayers();
+    const sf=document.getElementById('fGrpFilter');
+    if(sf) {
+      sf.innerHTML='<option value="">كل المجموعات</option>'+GRP.all().map(g=>`<option value="${g.id}">${grpLabel(g)}</option>`).join('');
+    }
+  }
   else if(curPage==='groups')app.innerHTML=pgGroups();
   else if(curPage==='attendance')app.innerHTML=pgAtt();
   else if(curPage==='finance')app.innerHTML=pgFin();
@@ -483,6 +492,10 @@ function pgPlayers(){
   return`<div class="page">
   <div class="ph"><h1 class="pt">👥 اللاعبون</h1><button class="btn btn-p" onclick="openAddPl()">+ إضافة لاعب</button></div>
   <div class="swrap"><span class="sico">🔍</span><input class="fi" id="sq" type="text" placeholder="بحث بالاسم أو الرقم..." oninput="filterPl()"></div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <select class="fi" id="fGrpFilter" style="flex:1;min-width:120px" onchange="filterPl()"></select>
+    <input class="fi" type="number" id="fAgeFilter" placeholder="سنة الميلاد أو السن" style="flex:1;min-width:120px" oninput="filterPl()">
+  </div>
   <div id="plList">${renderPL(PL.all(),paidSet)}</div>
   </div>`;
 }
@@ -495,9 +508,17 @@ function renderPL(list,paidSet){
 }
 function filterPl(){
   const q=document.getElementById('sq').value.toLowerCase();
+  const g=document.getElementById('fGrpFilter').value;
+  const a=document.getElementById('fAgeFilter').value;
   const mo=fmM(new Date());
   const paidSet=new Set(PAY.all().filter(p=>p.month===mo).map(p=>p.playerId));
-  document.getElementById('plList').innerHTML=renderPL(PL.all().filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q)),paidSet);
+  
+  let list = PL.all();
+  if(q) list = list.filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q));
+  if(g) list = list.filter(p=>p.groupId===g);
+  if(a) list = list.filter(p=>p.age==a || (p.birth && p.birth.startsWith(a)));
+  
+  document.getElementById('plList').innerHTML=renderPL(list,paidSet);
 }
 
 // GROUPS
@@ -674,6 +695,7 @@ function openAddPl(){
   editId=null;photo=null;
   document.getElementById('modPT').textContent='+ إضافة لاعب جديد';
   document.getElementById('fName').value='';document.getElementById('fAge').value='';
+  document.getElementById('fBirth').value='';
   document.getElementById('fPhone').value='';document.getElementById('fJoin').value=tod();
   document.getElementById('fSub').value='700';
   document.getElementById('puc').innerHTML='<span style="font-size:1.9rem;color:var(--muted)">📷</span>';
@@ -685,6 +707,7 @@ function openEditPl(id){
   editId=id;photo=p.photo||null;
   document.getElementById('modPT').textContent='✏️ تعديل بيانات اللاعب';
   document.getElementById('fName').value=p.name;document.getElementById('fAge').value=p.age;
+  document.getElementById('fBirth').value=p.birth||'';
   document.getElementById('fPhone').value=p.phone;document.getElementById('fJoin').value=p.joinDate;
   document.getElementById('fSub').value=p.subAmt||'700';
   document.getElementById('puc').innerHTML=p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover">`:'<span style="font-size:1.9rem;color:var(--muted)">📷</span>';
@@ -692,17 +715,25 @@ function openEditPl(id){
   openM('modPlayer');
 }
 function onPhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{photo=ev.target.result;document.getElementById('puc').innerHTML=`<img src="${photo}" style="width:100%;height:100%;object-fit:cover">`};r.readAsDataURL(f);}
+function calcAge(b){
+  if(!b)return;
+  const bd=new Date(b),td=new Date();
+  let a=td.getFullYear()-bd.getFullYear();
+  if(td.getMonth()<bd.getMonth() || (td.getMonth()===bd.getMonth() && td.getDate()<bd.getDate())) a--;
+  document.getElementById('fAge').value=a;
+}
 function savePlayer(){
   const name=document.getElementById('fName').value.trim();
   const age=document.getElementById('fAge').value;
+  const birth=document.getElementById('fBirth').value;
   const phone=document.getElementById('fPhone').value.trim();
   const join=document.getElementById('fJoin').value;
   const grp=document.getElementById('fGroup').value;
   const subAmt=+document.getElementById('fSub').value||700;
   if(!name||!age||!phone||!join){toast('يرجى ملء جميع الحقول المطلوبة','err');return;}
   const all=PL.all();
-  if(editId){const i=all.findIndex(p=>p.id===editId);all[i]={...all[i],name,age:+age,phone,joinDate:join,groupId:grp,subAmt,photo};toast('تم تعديل بيانات اللاعب ✓');}
-  else{all.push({id:uid(),name,age:+age,phone,joinDate:join,groupId:grp,subAmt,photo});toast('تمت إضافة اللاعب بنجاح ✓');}
+  if(editId){const i=all.findIndex(p=>p.id===editId);all[i]={...all[i],name,age:+age,birth,phone,joinDate:join,groupId:grp,subAmt,photo};toast('تم تعديل بيانات اللاعب ✓');}
+  else{all.push({id:uid(),name,age:+age,birth,phone,joinDate:join,groupId:grp,subAmt,photo});toast('تمت إضافة اللاعب بنجاح ✓');}
   PL.save(all);closeM('modPlayer');render();
 }
 
