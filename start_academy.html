@@ -240,6 +240,40 @@ tr:hover td{background:rgba(0,212,255,.02)}
   </div>
 </div>
 
+<!-- Modal: Bulk Import -->
+<div class="ov" id="modBulk">
+  <div class="mbox" style="max-width:580px">
+    <h2 class="mt">📥 إضافة جماعية من إكسيل</h2>
+    <p style="color:var(--muted);font-size:.83rem;margin-bottom:12px;line-height:1.7">
+      جهّز شيت إكسيل به هذه الأعمدة بالترتيب:
+    </p>
+    <div style="background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);border-radius:var(--rs);padding:10px 12px;margin-bottom:14px;font-size:.8rem">
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;text-align:center;font-weight:800">
+        <div style="color:var(--p)">الاسم</div>
+        <div style="color:var(--muted)">التليفون</div>
+        <div style="color:var(--muted)">تاريخ الميلاد</div>
+        <div style="color:var(--muted)">السن</div>
+        <div style="color:var(--muted)">الاشتراك</div>
+        <div style="color:var(--ok)">اسم المجموعة</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;text-align:center;color:var(--muted);margin-top:4px">
+        <div>أحمد علي</div>
+        <div>0112345678</div>
+        <div>2010-05-12</div>
+        <div>14</div>
+        <div>700</div>
+        <div style="color:var(--ok)">مجموعة 6 مساءً</div>
+      </div>
+    </div>
+    <div id="bulkGrpHint" style="background:rgba(0,230,138,.07);border:1px solid rgba(0,230,138,.2);border-radius:var(--rs);padding:8px 12px;margin-bottom:12px;font-size:.78rem;color:var(--ok)"></div>
+    <textarea class="fi" id="excelPaste" rows="7" placeholder="الزق (Paste) اللعيبة هنا..." style="resize:vertical;font-family:monospace"></textarea>
+    <div style="display:flex;gap:8px;margin-top:18px">
+      <button class="btn btn-p" style="flex:1" onclick="pasteExcel()">💾 إضافة اللعيبة</button>
+      <button class="btn btn-g" onclick="closeM('modBulk')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Group -->
 <div class="ov" id="modGroup">
   <div class="mbox">
@@ -285,7 +319,17 @@ tr:hover td{background:rgba(0,212,255,.02)}
     <div id="payInfo" style="background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:var(--rs);padding:11px;margin-bottom:14px"></div>
     <div class="fg"><label class="fl">الشهر *</label><input class="fi" id="payMonth" type="month"></div>
     <div class="fg"><label class="fl">تاريخ الدفع *</label><input class="fi" id="payDate" type="date"></div>
-    <div class="fg"><label class="fl">المبلغ</label><input class="fi" id="payAmt" type="number" value="700" readonly style="opacity:.65"></div>
+    <div class="fg">
+      <label class="fl">عدد الوحدات (تمارين) المدفوعة</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="fi" id="payUnits" type="number" min="1" max="31" value="8" style="width:80px;text-align:center;flex-shrink:0" oninput="recalcAmt()">
+        <div style="color:var(--muted);font-size:.78rem;line-height:1.4">من عدد <span id="payTotalUnits">8</span> وحدة (فالشهر كامل)<br>لو اشترك نص الشهر ← اكتب 4</div>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">المبلغ المحسوب تلقائياً</label>
+      <input class="fi" id="payAmt" type="number" readonly style="opacity:.65;font-size:1.1rem;font-weight:800;color:var(--ok)">
+    </div>
     <div style="display:flex;gap:8px;margin-top:18px">
       <button class="btn btn-p" style="flex:1" onclick="confirmPay()">✓ تأكيد الدفع</button>
       <button class="btn btn-g" onclick="closeM('modPay')">إلغاء</button>
@@ -490,7 +534,13 @@ function pgPlayers(){
   const mo=fmM(new Date());
   const paidSet=new Set(PAY.all().filter(p=>p.month===mo).map(p=>p.playerId));
   return`<div class="page">
-  <div class="ph"><h1 class="pt">👥 اللاعبون</h1><button class="btn btn-p" onclick="openAddPl()">+ إضافة لاعب</button></div>
+  <div class="ph" style="align-items:flex-start">
+    <h1 class="pt">👥 اللاعبون</h1>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="btn btn-s btn-sm" onclick="openBulk()" style="font-size:.8rem">📥 من إكسيل</button>
+      <button class="btn btn-p btn-sm" onclick="openAddPl()" style="font-size:.8rem">+ فردي</button>
+    </div>
+  </div>
   <div class="swrap"><span class="sico">🔍</span><input class="fi" id="sq" type="text" placeholder="بحث شامل: الاسم، التليفون، السن، سنة الميلاد، قيمة الاشتراك..." oninput="filterPl()"></div>
   <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
     <select class="fi" id="fGrpFilter" style="flex:1;min-width:120px" onchange="filterPl()"></select>
@@ -742,6 +792,67 @@ function savePlayer(){
   else{all.push({id:uid(),name,age:+age,birth,phone,joinDate:join,groupId:grp,subAmt,photo});toast('تمت إضافة اللاعب بنجاح ✓');}
   PL.save(all);closeM('modPlayer');render();
 }
+function openBulk(){
+  document.getElementById('excelPaste').value='';
+  // Show existing groups as hint
+  const grps=GRP.all();
+  const hint=document.getElementById('bulkGrpHint');
+  if(grps.length===0){
+    hint.textContent='⚠️ ليس عندك مجموعات حتى الآن. أضف المجموعات أولاً من صفحة المجموعات.';
+    hint.style.borderColor='rgba(255,192,68,.4)';
+    hint.style.color='var(--warn)';
+    hint.style.background='rgba(255,192,68,.07)';
+  } else {
+    hint.innerHTML=`أسماء المجموعات المتاحة (اكتبها بنفس الطريقة في العمود السادس): بردشة هتلاقيا المجموعة الصح 👍<br><strong>${grps.map(g=>g.name).join(' • ')}</strong>`;
+    hint.style.borderColor='rgba(0,230,138,.2)';
+    hint.style.color='var(--ok)';
+    hint.style.background='rgba(0,230,138,.07)';
+  }
+  openM('modBulk');
+}
+function pasteExcel(){
+  const txt=document.getElementById('excelPaste').value.trim();
+  if(!txt){toast('لم تقم بلصق أي بيانات','err');return;}
+  const lines=txt.split('\n');
+  const all=PL.all();
+  const grps=GRP.all();
+  let added=0, unmatched=[];
+  lines.forEach(l=>{
+    const cols=l.split('\t').map(c=>c.trim());
+    if(cols.length>=1 && cols[0]){
+      const name=cols[0];
+      const phone=cols[1]||'';
+      const birth=cols[2]||'';
+      let age=parseInt(cols[3]);
+      if(isNaN(age)){
+        if(birth){
+          const bd=new Date(birth),td=new Date();
+          if(!isNaN(bd)){age=td.getFullYear()-bd.getFullYear();if(td.getMonth()<bd.getMonth()||(td.getMonth()===bd.getMonth()&&td.getDate()<bd.getDate()))age--;} else age=0;
+        } else age=0;
+      }
+      const subAmt=parseInt(cols[4])||700;
+      // match group by name (case-insensitive, partial match)
+      const grpName=(cols[5]||'').trim().toLowerCase();
+      let groupId='';
+      if(grpName){
+        const matched=grps.find(g=>g.name.toLowerCase().includes(grpName)||grpName.includes(g.name.toLowerCase()));
+        if(matched) groupId=matched.id;
+        else unmatched.push(grpName);
+      }
+      all.push({id:uid(),name,phone,birth,age,subAmt,joinDate:tod(),groupId,photo:null});
+      added++;
+    }
+  });
+  if(added>0){
+    PL.save(all);
+    let msg=`تمت إضافة ${added} لاعب ✓`;
+    if(unmatched.length>0) msg+=` (تعذّر إيجاد مجموعة: ${[...new Set(unmatched)].join(', ')})`;
+    toast(msg);
+    closeM('modBulk');render();
+  } else {
+    toast('لم يتم التعرف على أي بيانات صالحة','err');
+  }
+}
 
 function confDel(id,type){
   let msg='',fn;
@@ -818,18 +929,33 @@ function openPay(pid){
   const p=PL.all().find(x=>x.id===pid);
   const g=GRP.all().find(x=>x.id===p?.groupId);
   const now=new Date();
-  document.getElementById('payInfo').innerHTML=`<div style="display:flex;align-items:center;gap:8px">${av(p,34)}<div><div style="font-weight:700">${p?.name}</div><div style="font-size:.75rem;color:var(--muted)">${g?grpLabel(g):'—'}</div></div></div>`;
+  const fullUnits=8;
+  const subAmt=p?.subAmt||700;
+  document.getElementById('payInfo').innerHTML=`<div style="display:flex;align-items:center;gap:8px">${av(p,34)}<div><div style="font-weight:700">${p?.name}</div><div style="font-size:.75rem;color:var(--muted)">${g?grpLabel(g):'—'} • اشتراك شهر كامل: ${subAmt} ج</div></div></div>`;
   document.getElementById('payMonth').value=fmM(now);
   document.getElementById('payDate').value=tod();
-  document.getElementById('payAmt').value=p?.subAmt||700;
+  document.getElementById('payUnits').value=fullUnits;
+  document.getElementById('payTotalUnits').textContent=fullUnits;
+  document.getElementById('payAmt').value=subAmt;
+  document.getElementById('payAmt').dataset.sub=subAmt;
+  document.getElementById('payAmt').dataset.units=fullUnits;
   openM('modPay');closeM('modDetail');
+}
+function recalcAmt(){
+  const units=+document.getElementById('payUnits').value||0;
+  const totalUnits=+document.getElementById('payAmt').dataset.units||8;
+  const sub=+document.getElementById('payAmt').dataset.sub||700;
+  const amt=Math.round((sub/totalUnits)*units);
+  document.getElementById('payAmt').value=amt;
 }
 function confirmPay(){
   const mo=document.getElementById('payMonth').value,date=document.getElementById('payDate').value;
   const amt=+document.getElementById('payAmt').value||700;
+  const units=+document.getElementById('payUnits').value||8;
+  const totalUnits=+document.getElementById('payAmt').dataset.units||8;
   if(!mo||!date){toast('يرجى ملء جميع الحقول','err');return;}
   if(PAY.all().find(p=>p.playerId===payId&&p.month===mo)){toast('هذا اللاعب دفع بالفعل هذا الشهر!','err');return;}
-  const all=PAY.all();all.push({id:uid(),playerId:payId,month:mo,date,amount:amt});
+  const all=PAY.all();all.push({id:uid(),playerId:payId,month:mo,date,amount:amt,units,totalUnits});
   PAY.save(all);closeM('modPay');toast('تم تسجيل الدفعة بنجاح ✓');render();
 }
 function delPay(pid){
