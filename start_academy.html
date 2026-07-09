@@ -578,6 +578,11 @@ function pgPlayers(){
   <div class="swrap"><span class="sico">🔍</span><input class="fi" id="sq" type="text" placeholder="بحث شامل: الاسم، التليفون، السن، سنة الميلاد، قيمة الاشتراك..." oninput="filterPl()"></div>
   <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
     <select class="fi" id="fGrpFilter" style="flex:1;min-width:120px" onchange="filterPl()"></select>
+    <select class="fi" id="fPayFilter" style="flex:1;min-width:120px" onchange="filterPl()">
+      <option value="">حالة الدفع (الكل)</option>
+      <option value="paid">دفعوا</option>
+      <option value="unpaid">لم يدفعوا</option>
+    </select>
   </div>
   <div id="plList">${renderPL(PL.all(),paidSet)}</div>
   </div>`;
@@ -592,11 +597,14 @@ function renderPL(list,paidSet){
 function filterPl(){
   const q=document.getElementById('sq').value.toLowerCase().trim();
   const g=document.getElementById('fGrpFilter').value;
+  const paySt=document.getElementById('fPayFilter')?.value;
   const mo=fmM(new Date());
   const paidSet=new Set(PAY.all().filter(p=>p.month===mo).map(p=>p.playerId));
   
   let list = PL.all();
   if(g) list = list.filter(p=>p.groupId===g);
+  if(paySt === 'paid') list = list.filter(p=>paidSet.has(p.id));
+  if(paySt === 'unpaid') list = list.filter(p=>!paidSet.has(p.id));
   if(q) {
     list = list.filter(p=>{
       return (p.name&&p.name.toLowerCase().includes(q)) ||
