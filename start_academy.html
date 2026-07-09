@@ -524,7 +524,7 @@ function grpLabel(g){return g?`${g.name} (${fmTime(g.time)})`:'—';}
 function pgDash(){
   const now=new Date(),mo=fmM(now);
   const fin=mFin(mo),all=PL.all(),grps=GRP.all();
-  const moPaid=PAY.all().filter(p=>p.month===mo);
+  const moPaid=PAY.all().filter(p=>p.month===mo && all.some(pl=>pl.id===p.playerId));
   const paidSet=new Set(moPaid.map(p=>p.playerId));
   const unpaid=all.filter(p=>!paidSet.has(p.id));
   const td=now.getDay();
